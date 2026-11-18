@@ -459,8 +459,23 @@
 
       floor.extOpenings.forEach((op) => {
         const yWall = op.side === "top" ? 0 : 870;
+        const typeLabel = op.type === "entry-door" ? "Porte d'entrée" : (op.type === "window-high" ? "Châssis haut" : "Fenêtre 2 vantaux");
+        const tip = `${op.code ? op.code + " — " : ""}${typeLabel} (${op.w} cm)${op.vent ? " • Vent. " + op.vent : ""}`;
+
         gJoin.appendChild(el("rect", { x: op.x, y: yWall - 1, width: op.w, height: 32, fill: "#ffffff", stroke: "none" }));
-        gJoin.appendChild(el("rect", { x: op.x, y: yWall + 8, width: op.w, height: 14, fill: "#e0f2fe", stroke: "#0284c7", "stroke-width": "2" }));
+        const frame = el("rect", {
+          x: op.x, y: yWall + 8, width: op.w, height: 14,
+          fill: "#e0f2fe", stroke: "#0284c7", "stroke-width": "2",
+          "pointer-events": isOverlayTop ? "none" : "auto",
+          style: "cursor:help"
+        }, [el("title", {}, [tip])]);
+        frame.addEventListener("mouseenter", () => {
+          document.getElementById("status-room").textContent = `Menuiserie : ${tip}`;
+        });
+        frame.addEventListener("mouseleave", () => {
+          document.getElementById("status-room").textContent = "Survol : —";
+        });
+        gJoin.appendChild(frame);
         gJoin.appendChild(el("line", { x1: op.x, y1: yWall + 15, x2: op.x + op.w, y2: yWall + 15, stroke: "#0369a1", "stroke-width": "1.5" }));
 
         if (op.type === "entry-door") {
@@ -1563,6 +1578,67 @@
     document.getElementById("btn-export-png").addEventListener("click", () => exportPlan("png"));
     document.getElementById("btn-export-svg").addEventListener("click", () => exportPlan("svg"));
     document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+    document.getElementById("btn-fullscreen").addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    });
+
+    document.getElementById("btn-save-project").addEventListener("click", () => {
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        northAngle: state.northAngle,
+        removedPartitions: state.removedPartitions,
+        annotations: state.annotations,
+        budget: loadJSON("nelly_budget_v2", null)
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dossier-travaux-nelly-fernandez.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    const fileInput = document.getElementById("project-file-input");
+    document.getElementById("btn-load-project").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result));
+          if (Array.isArray(data.removedPartitions)) {
+            state.removedPartitions = data.removedPartitions;
+            localStorage.setItem("nelly_removed_partitions", JSON.stringify(state.removedPartitions));
+          }
+          if (Array.isArray(data.annotations)) {
+            state.annotations = data.annotations;
+            localStorage.setItem("nelly_annotations", JSON.stringify(state.annotations));
+          }
+          if (typeof data.northAngle === "number") {
+            state.northAngle = data.northAngle;
+            document.getElementById("north-slider").value = data.northAngle;
+            document.getElementById("north-angle-label").textContent = `${data.northAngle}°`;
+          }
+          if (data.budget) {
+            localStorage.setItem("nelly_budget_v2", JSON.stringify(data.budget));
+          }
+          renderAnnotationsSidebar();
+          render(false);
+        } catch (err) {
+          alert("Fichier de sauvegarde invalide.");
+        }
+      };
+      reader.readAsText(file);
+      fileInput.value = "";
+    });
 
     // Raccourcis clavier pro
     window.addEventListener("keydown", (e) => {

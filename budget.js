@@ -255,9 +255,10 @@
             <h2 style="border:none; margin:0; padding:0;">💶 Chiffrage Détaillé &amp; Matériaux — Maison Nelly Fernandez</h2>
             <span style="font-size:12px; color:#475569;">Choisissez vos formats exacts (ex. carrelage 60×120 cm), vos prix d'achat et le coût de pose éventuel.</span>
           </div>
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="btn" id="b-select-all-paint" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">🎨 Tout peindre</button>
-            <button class="btn btn-primary" id="b-print-artisans">📋 Imprimer Fiche Artisans</button>
+            <button class="btn" id="b-reset-budget" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">🧹 Réinit. chiffrage</button>
+            <button class="btn btn-primary" id="b-print-artisans">📋 Document Artisans</button>
           </div>
         </div>
 
@@ -519,8 +520,102 @@
       rerender();
     });
 
+    document.getElementById("b-reset-budget").addEventListener("click", () => {
+      if (confirm("Réinitialiser toutes les cases et prix du chiffrage ?")) {
+        localStorage.removeItem("nelly_budget_v2");
+        window.renderBudgetView(container, state, DATA, computeRoomMetrics, renderAnnotationsSidebar);
+      }
+    });
+
     document.getElementById("b-print-artisans").addEventListener("click", () => {
-      window.print();
+      const selectedRoomRows = allRooms
+        .map((r) => {
+          const cfg = b.rooms[r.id];
+          if (!cfg.paintWall && !cfg.paintCeil && cfg.floor === "none" && !cfg.plinthes) return "";
+          const m = computeRoomMetrics(r, b.ceilingH);
+          const tasks = [];
+          if (cfg.paintWall) tasks.push(`Peinture murs (${m.wallPaintM2.toFixed(1)} m²)`);
+          if (cfg.paintCeil) tasks.push(`Peinture plafond (${r.surface.toFixed(2)} m²)`);
+          if (cfg.floor === "parquet") tasks.push(`Pose parquet (${r.surface.toFixed(2)} m²)`);
+          if (cfg.floor === "tile") tasks.push(`Pose carrelage ${p.tileW}×${p.tileH} cm (${r.surface.toFixed(2)} m² nets)`);
+          if (cfg.plinthes) tasks.push(`Pose plinthes (${m.plinthesM.toFixed(1)} ml)`);
+          return `<tr><td><strong>${r.name}</strong> (${r.floorName})</td><td>${r.surface.toFixed(2)} m²</td><td>${tasks.join(" • ")}</td></tr>`;
+        })
+        .filter(Boolean)
+        .join("");
+
+      const demoDocRows = state.removedPartitions.map((pk) => {
+        const [fl, idxStr] = pk.split(":");
+        const part = DATA.floors[fl]?.partitions[Number(idxStr)];
+        if (!part) return "";
+        const lenM = Math.max(part[2], part[3]) / 100;
+        return `<tr><td>Cloison #${Number(idxStr) + 1} (${fl.toUpperCase()})</td><td>${lenM.toFixed(2)} m × ${b.ceilingH.toFixed(2)} m</td><td>${(lenM * b.ceilingH).toFixed(1)} m²</td></tr>`;
+      }).join("");
+
+      const equipList = [];
+      if (b.equip.heaters > 0) equipList.push(`<li>Remplacement de <strong>${b.equip.heaters}</strong> radiateur(s) électrique(s)</li>`);
+      if (b.equip.windows > 0) equipList.push(`<li>Remplacement de <strong>${b.equip.windows}</strong> fenêtre(s) double vitrage</li>`);
+      if (b.equip.entryDoor > 0) equipList.push(`<li>Remplacement de <strong>${b.equip.entryDoor}</strong> porte d'entrée (L8 — 85 cm)</li>`);
+      if (b.equip.elecPanel) equipList.push(`<li>Mise aux normes du tableau électrique</li>`);
+      if (b.equip.vmc) equipList.push(`<li>Installation / remplacement VMC</li>`);
+
+      const notesDocRows = state.annotations.map((ann, i) =>
+        `<tr><td><strong>#${i + 1}</strong></td><td>${ann.floor.toUpperCase()}</td><td>${ann.text}</td></tr>`
+      ).join("");
+
+      const win = window.open("", "_blank");
+      if (!win) {
+        window.print();
+        return;
+      }
+      win.document.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Cahier des Charges Travaux — Maison Nelly Fernandez (Pélissanne)</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #0f172a; margin: 28px 34px; line-height: 1.45; }
+    .hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #0f172a; padding-bottom: 10px; margin-bottom: 18px; }
+    h1 { font-size: 20px; margin: 0; }
+    h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #0284c7; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+    th, td { border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; }
+    th { background: #f1f5f9; }
+    .meta { font-size: 12.5px; color: #475569; margin-bottom: 16px; }
+    .no-print { margin-bottom: 18px; }
+    .btn-print { background: #0284c7; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
+    @media print { .no-print { display: none; } body { margin: 12mm; } }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+  </div>
+  <div class="hdr">
+    <div>
+      <h1>CAHIER DES CHARGES TRAVAUX — DEMANDE DE DEVIS</h1>
+      <div style="font-size:13px; color:#475569; margin-top:4px;">Maison Nelly Fernandez — 11 Rue du Hameau, Pélissanne</div>
+    </div>
+    <div style="text-align:right; font-size:12px;">
+      <strong>Date :</strong> ${new Date().toLocaleDateString("fr-FR")}<br>
+      <strong>Surface :</strong> 95,78 m² (RDC + Étage)
+    </div>
+  </div>
+  <div class="meta">
+    <strong>Caractéristiques :</strong> Construction Parpaing (murs ext. 30 cm, cloisons 6 cm) • Emprise 6,60 m × 9,00 m • Hauteur sous plafond retenue : <strong>${b.ceilingH.toFixed(2)} m</strong> • Mode souhaité : <strong>${b.mode === "pro" ? "Fourniture + Pose par artisan" : "Pose seule (matériaux fournis)"}</strong>.
+  </div>
+
+  <h2>1. Travaux demandés par pièce</h2>
+  ${selectedRoomRows ? `<table><thead><tr><th>Pièce</th><th>Surface sol</th><th>Prestations &amp; Métrés</th></tr></thead><tbody>${selectedRoomRows}</tbody></table>` : `<p style="font-size:13px; color:#64748b;">Aucune pièce sélectionnée dans l'outil de chiffrage.</p>`}
+
+  ${demoDocRows ? `<h2>2. Ouvertures / Dépose de cloisons non porteuses (6 cm)</h2><table><thead><tr><th>Cloison</th><th>Dimensions</th><th>Surface</th></tr></thead><tbody>${demoDocRows}</tbody></table>` : ""}
+
+  ${equipList.length ? `<h2>3. Équipements, Chauffage &amp; Menuiseries</h2><ul style="font-size:13px; margin-left:18px;">${equipList.join("")}</ul>` : ""}
+
+  ${notesDocRows ? `<h2>4. Notes de chantier repérées sur le plan</h2><table><thead><tr><th>N°</th><th>Niveau</th><th>Description</th></tr></thead><tbody>${notesDocRows}</tbody></table>` : ""}
+</body>
+</html>`);
+      win.document.close();
     });
   };
 })();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plans Maison Nelly Fernandez — Pélissanne</title>
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=25">
   <script type="importmap">
   {
     "imports": {
@@ -40,6 +40,7 @@
       <button class="btn" id="btn-measure" title="Mesurer une distance entre deux points (Touche M)">📏 Mesurer</button>
       <button class="btn" id="btn-export-png" title="Télécharger la planche en image PNG haute définition">🖼️ PNG</button>
       <button class="btn" id="btn-export-svg" title="Télécharger le plan vectoriel SVG">📐 SVG</button>
+      <button class="btn" id="btn-fullscreen" title="Basculer en plein écran">⛶</button>
       <button class="btn btn-primary" id="btn-print" title="Imprimer ou enregistrer en PDF (Format A3 Paysage)">🖨️ Imprimer / PDF</button>
     </div>
   </header>
@@ -107,6 +108,11 @@
 
       <div class="sidebar-section">
         <h2>Notes &amp; Travaux <button class="btn" id="btn-reset-works" style="padding:2px 7px; font-size:10px;">Réinit.</button></h2>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <button class="btn" id="btn-save-project" style="flex:1; justify-content:center; padding:4px 6px; font-size:11px;" title="Exporter vos travaux, notes et budget en fichier .json">💾 Sauvegarder</button>
+          <button class="btn" id="btn-load-project" style="flex:1; justify-content:center; padding:4px 6px; font-size:11px;" title="Charger un fichier .json sauvegardé">📂 Charger</button>
+          <input type="file" id="project-file-input" accept=".json" style="display:none;">
+        </div>
         <div id="annotations-list" style="color:#94a3b8; font-size:11.5px;">
           Aucune note. Utilisez « 📌 Annoter » ou « 🔨 Cloisons ».
         </div>
@@ -173,9 +179,9 @@
     </div>
   </div>
 
-  <script src="plans-data.js?v=24"></script>
-  <script type="module" src="view3d.js?v=24"></script>
-  <script src="budget.js?v=24"></script>
-  <script src="app.js?v=24"></script>
+  <script src="plans-data.js?v=25"></script>
+  <script type="module" src="view3d.js?v=25"></script>
+  <script src="budget.js?v=25"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
