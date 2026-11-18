@@ -97,21 +97,21 @@ window.renderThree3DView = function (container, state, getFloorData, categoryCol
   container.innerHTML = `
     <div class="view3d-wrapper">
       <div class="view3d-controls">
-        <span style="color:#475569;">🖱️ Glisser gauche : Pivoter • Clic droit : Déplacer • Molette : Zoomer</span>
+        <span style="color:#52525b;">Glisser gauche : Pivoter &bull; Clic droit : Déplacer &bull; Molette : Zoomer</span>
         <label>Écartement :
           <input type="range" id="explode-slider" min="0" max="280" value="${state.view3d.explode}">
         </label>
-        <select id="filter-3d-floor" class="btn" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">
+        <select id="filter-3d-floor" class="btn" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">
           <option value="both" ${state.view3d.floorFilter === "both" ? "selected" : ""}>RDC + Étage</option>
           <option value="rdc" ${state.view3d.floorFilter === "rdc" ? "selected" : ""}>RDC seul</option>
           <option value="etage" ${state.view3d.floorFilter === "etage" ? "selected" : ""}>Étage seul</option>
         </select>
-        <select id="filter-3d-walls" class="btn" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">
+        <select id="filter-3d-walls" class="btn" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">
           <option value="full" ${(state.view3d.wallMode || "full") === "full" ? "selected" : ""}>Murs : Pleins</option>
-          <option value="cut" ${state.view3d.wallMode === "cut" ? "selected" : ""}>Murs : Coupés (Sims)</option>
+          <option value="cut" ${state.view3d.wallMode === "cut" ? "selected" : ""}>Murs : Coupés</option>
           <option value="glass" ${state.view3d.wallMode === "glass" ? "selected" : ""}>Murs : Transparents</option>
         </select>
-        <select id="sun-month" class="btn" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;" title="Mois de l'année (Pélissanne 43.63° N)">
+        <select id="sun-month" class="btn" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;" title="Mois de l'année (Pélissanne 43.63° N)">
           <option value="1" ${state.view3d.sunMonth === 1 ? "selected" : ""}>Janvier</option>
           <option value="2" ${state.view3d.sunMonth === 2 ? "selected" : ""}>Février</option>
           <option value="3" ${state.view3d.sunMonth === 3 ? "selected" : ""}>Mars</option>
@@ -125,16 +125,16 @@ window.renderThree3DView = function (container, state, getFloorData, categoryCol
           <option value="11" ${state.view3d.sunMonth === 11 ? "selected" : ""}>Novembre</option>
           <option value="12" ${state.view3d.sunMonth === 12 ? "selected" : ""}>Décembre</option>
         </select>
-        <label style="display:inline-flex; align-items:center; gap:4px;">
-          ☀️ <input type="range" id="sun-slider" min="6" max="22" step="0.5" value="${state.view3d.sunHour || 14}" style="width:70px;">
-          <span id="sun-label" style="min-width:34px;">${state.view3d.sunHour || 14}h</span>
+        <label style="display:inline-flex; align-items:center; gap:5px;">
+          Soleil : <input type="range" id="sun-slider" min="6" max="22" step="0.5" value="${state.view3d.sunHour || 14}" style="width:70px;">
+          <span id="sun-label" style="min-width:32px;">${state.view3d.sunHour || 14}h</span>
         </label>
         <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
-          <input type="checkbox" id="roof-toggle" ${state.view3d.showRoof ? "checked" : ""}> 🏠 Toiture
+          <input type="checkbox" id="roof-toggle" ${state.view3d.showRoof ? "checked" : ""}> Toiture
         </label>
-        <button class="btn" id="top-3d-btn" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">Vue dessus</button>
-        <button class="btn" id="reset-3d-btn" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">Vue Iso</button>
-        <button class="btn btn-primary" id="walk-3d-btn" title="Se balader à pied dans les pièces et monter à l'étage">🚶 Visite 1ʳᵉ pers.</button>
+        <button class="btn" id="top-3d-btn" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">Dessus</button>
+        <button class="btn" id="reset-3d-btn" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">Iso</button>
+        <button class="btn btn-primary" id="walk-3d-btn" title="Se balader à pied dans les pièces et monter à l'étage">Visite 1ʳᵉ pers.</button>
       </div>
       <div id="three-mount" style="position:relative; flex:1; width:100%; min-height:0; overflow:hidden; background:#cbd5e1;">
         <div id="walk-crosshair" style="display:none; position:absolute; top:50%; left:50%; width:8px; height:8px; transform:translate(-50%,-50%); border:2px solid rgba(255,255,255,0.85); border-radius:50%; box-shadow:0 0 4px rgba(0,0,0,0.6); pointer-events:none; z-index:9;"></div>

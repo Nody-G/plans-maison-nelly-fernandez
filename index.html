@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plans Maison Nelly Fernandez — Pélissanne</title>
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=26">
   <script type="importmap">
   {
     "imports": {
@@ -19,47 +22,63 @@
     <div class="brand">
       <div class="brand-badge">NF</div>
       <div class="brand-title">
-        <h1>Maison Nelly Fernandez — Pélissanne</h1>
-        <span>Plan d'Architecte &amp; Dossier Technique • 95,78 m²</span>
+        <h1>Maison Nelly Fernandez</h1>
+        <span>Pélissanne &bull; 95,78 m²</span>
       </div>
     </div>
 
     <nav class="view-tabs" aria-label="Modes d'affichage">
       <button class="view-tab active" data-view="both">RDC + Étage</button>
-      <button class="view-tab" data-view="rdc">Rez-de-Chaussée</button>
+      <button class="view-tab" data-view="rdc">RDC</button>
       <button class="view-tab" data-view="etage">Étage</button>
       <button class="view-tab" data-view="overlay">Superposition</button>
       <button class="view-tab" data-view="3d">Vue 3D</button>
-      <button class="view-tab" data-view="specs">Surfaces &amp; Fiche</button>
-      <button class="view-tab" data-view="budget">💶 Chiffrage &amp; Travaux</button>
+      <button class="view-tab" data-view="specs">Surfaces</button>
+      <button class="view-tab" data-view="budget">Chiffrage &amp; Travaux</button>
     </nav>
 
     <div class="actions-bar">
-      <button class="btn" id="btn-renovate" title="Cliquer sur une cloison (6 cm) pour l'ouvrir ou la remettre">🔨 Cloisons</button>
-      <button class="btn" id="btn-annotate" title="Cliquer sur le plan pour ajouter une note de chantier">📌 Annoter</button>
-      <button class="btn" id="btn-measure" title="Mesurer une distance entre deux points (Touche M)">📏 Mesurer</button>
-      <button class="btn" id="btn-export-png" title="Télécharger la planche en image PNG haute définition">🖼️ PNG</button>
-      <button class="btn" id="btn-export-svg" title="Télécharger le plan vectoriel SVG">📐 SVG</button>
-      <button class="btn" id="btn-fullscreen" title="Basculer en plein écran">⛶</button>
-      <button class="btn btn-primary" id="btn-print" title="Imprimer ou enregistrer en PDF (Format A3 Paysage)">🖨️ Imprimer / PDF</button>
+      <div class="dropdown">
+        <button class="btn" id="btn-export-menu" title="Exporter ou sauvegarder le dossier">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exporter
+        </button>
+        <div class="dropdown-menu" id="export-dropdown">
+          <button class="dropdown-item" id="btn-export-png">Image PNG (Haute Déf.)</button>
+          <button class="dropdown-item" id="btn-export-svg">Plan vectoriel SVG</button>
+          <div class="dropdown-sep"></div>
+          <button class="dropdown-item" id="btn-save-project">Sauvegarder dossier (.json)</button>
+          <button class="dropdown-item" id="btn-load-project">Charger dossier (.json)</button>
+        </div>
+        <input type="file" id="project-file-input" accept=".json" style="display:none;">
+      </div>
+
+      <button class="btn" id="btn-fullscreen" title="Plein écran">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+
+      <button class="btn btn-primary" id="btn-print" title="Imprimer ou enregistrer en PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimer PDF
+      </button>
     </div>
   </header>
 
   <div class="workspace">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-section">
-        <h2>Calques du plan</h2>
+        <h2>Calques</h2>
         <div class="layer-list">
           <label class="layer-item">
-            <span class="layer-left"><span class="layer-dot" style="background:#1e293b"></span>Murs &amp; Cloisons</span>
+            <span class="layer-left"><span class="layer-dot" style="background:#18181b"></span>Murs &amp; Cloisons</span>
             <input type="checkbox" class="layer-toggle" data-layer="walls" checked>
           </label>
           <label class="layer-item">
-            <span class="layer-left"><span class="layer-dot" style="background:#0284c7"></span>Menuiseries &amp; Portes</span>
+            <span class="layer-left"><span class="layer-dot" style="background:#2563eb"></span>Menuiseries &amp; Portes</span>
             <input type="checkbox" class="layer-toggle" data-layer="joinery" checked>
           </label>
           <label class="layer-item">
-            <span class="layer-left"><span class="layer-dot" style="background:#0f172a"></span>Cotations (cm / m)</span>
+            <span class="layer-left"><span class="layer-dot" style="background:#71717a"></span>Cotations</span>
             <input type="checkbox" class="layer-toggle" data-layer="dimensions" checked>
           </label>
           <label class="layer-item">
@@ -79,28 +98,30 @@
             <input type="checkbox" class="layer-toggle" data-layer="electrical" checked>
           </label>
           <label class="layer-item">
-            <span class="layer-left"><span class="layer-dot" style="background:#059669"></span>Ventilation (A, E, F, G)</span>
+            <span class="layer-left"><span class="layer-dot" style="background:#059669"></span>Ventilation</span>
             <input type="checkbox" class="layer-toggle" data-layer="ventilation" checked>
           </label>
         </div>
       </div>
 
       <div class="sidebar-section">
-        <h2>Inspecteur de pièce</h2>
+        <h2>Inspecteur</h2>
         <div class="inspector-card" id="inspector-content">
-          <h3>Sélectionnez une pièce</h3>
-          <p style="color:#94a3b8; font-size:12px; line-height:1.45; margin-top:6px;">
-            Cliquez sur n'importe quelle pièce du plan pour afficher ses dimensions exactes, sa surface et ses équipements.
-          </p>
+          <h3>Vue générale</h3>
+          <div class="inspector-metric">95,78 m²</div>
+          <div class="inspector-row"><span>Emprise</span><strong>6,60 × 9,00 m</strong></div>
+          <div class="inspector-row"><span>RDC / Étage</span><strong>49,20 / 46,58 m²</strong></div>
+          <div class="inspector-row"><span>Structure</span><strong>Parpaing 30 cm</strong></div>
+          <div class="inspector-notes">Cliquez sur une pièce du plan pour afficher ses cotes, plinthes et surfaces à peindre.</div>
         </div>
       </div>
 
       <div class="sidebar-section">
-        <h2>Orientation Nord (Pélissanne)</h2>
-        <div class="inspector-card" style="display:flex; flex-direction:column; gap:8px;">
+        <h2>Orientation Nord</h2>
+        <div class="inspector-card" style="display:flex; flex-direction:column; gap:6px;">
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-            <span>Angle du Nord :</span>
-            <strong id="north-angle-label" style="color:var(--accent)">15° (Réel)</strong>
+            <span style="color:var(--text-muted)">Azimut (Pélissanne)</span>
+            <strong id="north-angle-label" style="color:var(--accent)">15°</strong>
           </div>
           <input type="range" id="north-slider" min="0" max="359" value="15" style="width:100%; accent-color:var(--accent);">
         </div>
@@ -108,42 +129,44 @@
 
       <div class="sidebar-section">
         <h2>Notes &amp; Travaux <button class="btn" id="btn-reset-works" style="padding:2px 7px; font-size:10px;">Réinit.</button></h2>
-        <div style="display:flex; gap:6px; margin-bottom:8px;">
-          <button class="btn" id="btn-save-project" style="flex:1; justify-content:center; padding:4px 6px; font-size:11px;" title="Exporter vos travaux, notes et budget en fichier .json">💾 Sauvegarder</button>
-          <button class="btn" id="btn-load-project" style="flex:1; justify-content:center; padding:4px 6px; font-size:11px;" title="Charger un fichier .json sauvegardé">📂 Charger</button>
-          <input type="file" id="project-file-input" accept=".json" style="display:none;">
-        </div>
-        <div id="annotations-list" style="color:#94a3b8; font-size:11.5px;">
-          Aucune note. Utilisez « 📌 Annoter » ou « 🔨 Cloisons ».
-        </div>
-      </div>
-
-      <div class="sidebar-section">
-        <h2>Synthèse Bâtiment</h2>
-        <div class="inspector-card">
-          <div class="inspector-row"><span>Emprise ext.</span><strong>6,60 × 9,00 m</strong></div>
-          <div class="inspector-row"><span>RDC</span><strong>49,20 m²</strong></div>
-          <div class="inspector-row"><span>Étage</span><strong>46,58 m²</strong></div>
-          <div class="inspector-row"><span>Surface totale</span><strong>95,78 m²</strong></div>
-          <div class="inspector-row"><span>Murs extérieurs</span><strong>Parpaing 30 cm</strong></div>
-          <div class="inspector-row"><span>Cloisons</span><strong>6 cm (WC 10 cm)</strong></div>
-          <div class="inspector-row"><span>Chauffage</span><strong>Électrique</strong></div>
+        <div id="annotations-list" style="color:#a1a1aa; font-size:11.5px;">
+          Aucune note. Utilisez la barre d'outils en bas du plan.
         </div>
       </div>
     </aside>
 
     <main class="viewport" id="viewport">
-      <div class="measure-banner" id="measure-banner">
-        Mode Mesure actif : cliquez 2 points (maintenez <strong>Shift</strong> pour orthogonal, <strong>Échap</strong> pour effacer)
-      </div>
+      <div class="measure-banner" id="measure-banner"></div>
       <div class="canvas-stage" id="canvas-stage"></div>
+
+      <!-- Barre d'outils flottante 2D -->
+      <div class="floating-tools" id="floating-tools">
+        <button class="btn active" id="btn-select" title="Sélection et déplacement (Échap)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+          Sélection
+        </button>
+        <button class="btn" id="btn-measure" title="Mesurer une distance (Touche M)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+          Mesurer
+        </button>
+        <button class="btn" id="btn-renovate" title="Ouvrir ou fermer une cloison (6 cm)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18" stroke-dasharray="3 3"/></svg>
+          Cloisons
+        </button>
+        <button class="btn" id="btn-annotate" title="Poser une note de chantier">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Annoter
+        </button>
+      </div>
+
       <div class="floating-controls">
         <button class="btn" id="zoom-out" title="Dézoomer">−</button>
         <span class="zoom-label" id="zoom-label">100%</span>
         <button class="btn" id="zoom-in" title="Zoomer">+</button>
-        <button class="btn" id="zoom-fit" title="Ajuster le plan à l'écran (Touche F)">Ajuster</button>
+        <button class="btn" id="zoom-fit" title="Ajuster à l'écran (F)">Ajuster</button>
         <button class="btn" id="zoom-reset" title="Zoom 100%">1:1</button>
       </div>
+
       <div class="statusbar">
         <div class="statusbar-left">
           <span id="status-coords">Position : —</span>
@@ -161,16 +184,16 @@
 
   <div class="note-modal" id="note-modal">
     <div class="note-modal-card">
-      <h3>📌 Nouvelle note de chantier</h3>
-      <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Corps de métier</label>
+      <h3>Nouvelle note de chantier</h3>
+      <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Corps de métier</label>
       <select id="note-category">
-        <option value="elec">⚡ Électricité</option>
-        <option value="plomb">🚿 Plomberie</option>
-        <option value="peint">🎨 Peinture / Sols</option>
-        <option value="macon">🧱 Maçonnerie / Cloisons</option>
-        <option value="menuis">🪟 Menuiserie</option>
+        <option value="elec">Électricité</option>
+        <option value="plomb">Plomberie</option>
+        <option value="peint">Peinture / Sols</option>
+        <option value="macon">Maçonnerie / Cloisons</option>
+        <option value="menuis">Menuiserie</option>
       </select>
-      <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:4px;">Description des travaux</label>
+      <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Description</label>
       <input type="text" id="note-text" placeholder="Ex : Ajouter prise double, abattre cloison..." />
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
         <button class="btn" id="note-cancel">Annuler</button>
@@ -179,9 +202,9 @@
     </div>
   </div>
 
-  <script src="plans-data.js?v=25"></script>
-  <script type="module" src="view3d.js?v=25"></script>
-  <script src="budget.js?v=25"></script>
-  <script src="app.js?v=25"></script>
+  <script src="plans-data.js?v=26"></script>
+  <script type="module" src="view3d.js?v=26"></script>
+  <script src="budget.js?v=26"></script>
+  <script src="app.js?v=26"></script>
 </body>
 </html>

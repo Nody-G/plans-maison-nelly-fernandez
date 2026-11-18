@@ -250,15 +250,15 @@
 
     container.innerHTML = `
       <div class="data-view" style="max-width:1160px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:2px solid #18181b; padding-bottom:10px; margin-bottom:16px;">
           <div>
-            <h2 style="border:none; margin:0; padding:0;">💶 Chiffrage Détaillé &amp; Matériaux — Maison Nelly Fernandez</h2>
-            <span style="font-size:12px; color:#475569;">Choisissez vos formats exacts (ex. carrelage 60×120 cm), vos prix d'achat et le coût de pose éventuel.</span>
+            <h2 style="border:none; margin:0; padding:0;">Chiffrage Détaillé &amp; Matériaux — Maison Nelly Fernandez</h2>
+            <span style="font-size:12px; color:#52525b;">Choisissez vos formats exacts (ex. carrelage 60×120 cm), vos prix d'achat et le coût de pose éventuel.</span>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn" id="b-select-all-paint" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">🎨 Tout peindre</button>
-            <button class="btn" id="b-reset-budget" style="background:#f1f5f9; color:#0f172a; border-color:#cbd5e1;">🧹 Réinit. chiffrage</button>
-            <button class="btn btn-primary" id="b-print-artisans">📋 Document Artisans</button>
+            <button class="btn" id="b-select-all-paint" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">Tout peindre</button>
+            <button class="btn" id="b-reset-budget" style="background:#f4f4f5; color:#18181b; border-color:#d4d4d8;">Réinitialiser</button>
+            <button class="btn btn-primary" id="b-print-artisans">Document Artisans</button>
           </div>
         </div>
 

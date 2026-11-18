@@ -1149,11 +1149,19 @@
     stage.innerHTML = "";
 
     const isStatic = state.view === "specs" || state.view === "budget";
+    const is2D = state.view !== "3d" && !isStatic;
     stage.classList.toggle("static-view", isStatic);
     stage.classList.toggle("view-3d-full", state.view === "3d");
-    stage.classList.toggle("measuring", state.view !== "3d" && !isStatic && state.measureMode);
+    stage.classList.toggle("measuring", is2D && state.measureMode);
+
     const floatCtrl = document.querySelector(".floating-controls");
-    if (floatCtrl) floatCtrl.style.display = (state.view === "3d" || isStatic) ? "none" : "flex";
+    if (floatCtrl) floatCtrl.style.display = is2D ? "flex" : "none";
+    const floatTools = document.getElementById("floating-tools");
+    if (floatTools) floatTools.style.display = is2D ? "flex" : "none";
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) sidebar.classList.toggle("hidden", !is2D);
+    const statusBar = document.querySelector(".statusbar");
+    if (statusBar) statusBar.style.display = is2D ? "flex" : "none";
 
     if (state.view === "3d") {
       render3DView(stage);
@@ -1487,7 +1495,7 @@
         const [fl, idx] = pk.split(":");
         items.push(`
           <div class="annotation-item" style="border-left:3px solid #f97316;">
-            <span style="flex:1; color:#fdba74;">🔨 <strong>${fl.toUpperCase()}</strong> : Cloison #${Number(idx) + 1} ouverte</span>
+            <span style="flex:1; color:#fdba74;"><strong>${fl.toUpperCase()}</strong> : Cloison #${Number(idx) + 1} ouverte</span>
             <button class="btn" data-restore-part="${pk}" style="padding:2px 6px; font-size:10px;">Remettre</button>
           </div>
         `);
@@ -1502,7 +1510,7 @@
           </div>
         `);
       });
-      listEl.innerHTML = items.length ? items.join("") : "Aucune note. Utilisez « 📌 Annoter » ou « 🔨 Cloisons ».";
+      listEl.innerHTML = items.length ? items.join("") : "Aucune note. Utilisez la barre d'outils en bas du plan.";
       listEl.querySelectorAll("[data-del-ann]").forEach((b) => {
         b.addEventListener("click", () => {
           const id = Number(b.dataset.delAnn);
@@ -1525,17 +1533,38 @@
     window.__renderAnnotationsSidebar = renderAnnotationsSidebar;
     renderAnnotationsSidebar();
 
+    const selectBtn = document.getElementById("btn-select");
     function clearToolModes(except) {
       if (except !== "measure") state.measureMode = false;
       if (except !== "renovate") state.renovateMode = false;
       if (except !== "annotate") state.annotateMode = false;
+      const isSelect = !state.measureMode && !state.renovateMode && !state.annotateMode;
+      if (selectBtn) selectBtn.classList.toggle("active", isSelect);
       measureBtn.classList.toggle("active", state.measureMode);
       renovateBtn.classList.toggle("active", state.renovateMode);
       annotateBtn.classList.toggle("active", state.annotateMode);
       banner.classList.toggle("visible", state.measureMode || state.renovateMode || state.annotateMode);
-      if (state.measureMode) banner.innerHTML = "Mode Mesure actif : cliquez 2 points (<strong>Shift</strong> orthogonal, <strong>Échap</strong> effacer)";
-      else if (state.renovateMode) banner.innerHTML = "Mode Travaux : cliquez sur une cloison (6 cm) pour l'ouvrir ou la remettre";
-      else if (state.annotateMode) banner.innerHTML = "Mode Annotation : cliquez n'importe où sur le plan pour poser une note de chantier";
+      if (state.measureMode) banner.innerHTML = "Mode Mesure : cliquez 2 points (<strong>Shift</strong> orthogonal, <strong>Échap</strong> annuler)";
+      else if (state.renovateMode) banner.innerHTML = "Mode Cloisons : cliquez sur une cloison (6 cm) pour l'ouvrir ou la remettre";
+      else if (state.annotateMode) banner.innerHTML = "Mode Annotation : cliquez sur le plan pour ajouter une note de chantier";
+    }
+
+    if (selectBtn) {
+      selectBtn.addEventListener("click", () => {
+        clearToolModes(null);
+        render(false);
+      });
+    }
+
+    // Menu déroulant Exporter
+    const exportMenuBtn = document.getElementById("btn-export-menu");
+    const exportDropdown = document.getElementById("export-dropdown");
+    if (exportMenuBtn && exportDropdown) {
+      exportMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        exportDropdown.classList.toggle("open");
+      });
+      window.addEventListener("click", () => exportDropdown.classList.remove("open"));
     }
 
     function toggleMeasure(force) {
