@@ -22,6 +22,7 @@
     renovateMode: false,
     annotateMode: false,
     removedPartitions: loadJSON("nelly_removed_partitions", []), // ["rdc:4", ...]
+    removedDoors: loadJSON("nelly_removed_doors", []), // ["rdc:2", ...]
     annotations: loadJSON("nelly_annotations", []), // [{ id, floor, x, y, text }]
     measurePoints: [],
     shiftKey: false,
@@ -455,7 +456,7 @@
 
     // 5. CALQUE MENUISERIES & OUVERTURES
     if (state.layers.joinery) {
-      const gJoin = el("g", { class: "layer-joinery", "pointer-events": "none" });
+      const gJoin = el("g", { class: "layer-joinery", "pointer-events": state.renovateMode && !isOverlayTop ? "auto" : "none" });
 
       floor.extOpenings.forEach((op) => {
         const yWall = op.side === "top" ? 0 : 870;
@@ -498,38 +499,67 @@
         }
       });
 
-      floor.intDoors.forEach((d) => {
+      floor.intDoors.forEach((d, idx) => {
+        const doorKey = `${floorKey}:${idx}`;
+        const isDoorRemoved = state.removedDoors.includes(doorKey);
+        const doorCls = [
+          state.renovateMode && !isOverlayTop ? "door-editable" : "",
+          isDoorRemoved ? "door-removed" : ""
+        ].filter(Boolean).join(" ");
+        const gDoor = el("g", { class: doorCls });
+
         if (d.orient === "v") {
-          gJoin.appendChild(el("rect", { x: d.x - 1, y: d.y, width: 12, height: d.w, fill: "#ffffff" }));
+          gDoor.appendChild(el("rect", { x: d.x - 1, y: d.y, width: 12, height: d.w, fill: "#ffffff" }));
           if (d.dir === "left-up") {
-            gJoin.appendChild(el("line", { x1: d.x, y1: d.y, x2: d.x - d.w, y2: d.y, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x - d.w} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x, y1: d.y, x2: d.x - d.w, y2: d.y, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x - d.w} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "right-up") {
-            gJoin.appendChild(el("line", { x1: d.x + 6, y1: d.y, x2: d.x + 6 + d.w, y2: d.y, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x + 6 + d.w} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + 6} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x + 6, y1: d.y, x2: d.x + 6 + d.w, y2: d.y, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x + 6 + d.w} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + 6} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "right-down") {
-            gJoin.appendChild(el("line", { x1: d.x + 6, y1: d.y + d.w, x2: d.x + 6 + d.w, y2: d.y + d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x + 6} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + 6 + d.w} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x + 6, y1: d.y + d.w, x2: d.x + 6 + d.w, y2: d.y + d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x + 6} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + 6 + d.w} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "left-down") {
-            gJoin.appendChild(el("line", { x1: d.x, y1: d.y + d.w, x2: d.x - d.w, y2: d.y + d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x - d.w} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x, y1: d.y + d.w, x2: d.x - d.w, y2: d.y + d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x - d.w} ${d.y + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+          }
+          if (state.renovateMode && !isOverlayTop) {
+            gDoor.appendChild(el("rect", { x: d.x - 10, y: d.y, width: 26, height: d.w, fill: "transparent" }));
           }
         } else {
-          gJoin.appendChild(el("rect", { x: d.x, y: d.y - 1, width: d.w, height: 8, fill: "#ffffff" }));
+          gDoor.appendChild(el("rect", { x: d.x, y: d.y - 1, width: d.w, height: 8, fill: "#ffffff" }));
           if (d.dir === "down-left") {
-            gJoin.appendChild(el("line", { x1: d.x, y1: d.y + 6, x2: d.x, y2: d.y + 6 + d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x} ${d.y + 6 + d.w} A ${d.w} ${d.w} 0 0 0 ${d.x + d.w} ${d.y + 6}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x, y1: d.y + 6, x2: d.x, y2: d.y + 6 + d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x} ${d.y + 6 + d.w} A ${d.w} ${d.w} 0 0 0 ${d.x + d.w} ${d.y + 6}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "down-right") {
-            gJoin.appendChild(el("line", { x1: d.x + d.w, y1: d.y + 6, x2: d.x + d.w, y2: d.y + 6 + d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x} ${d.y + 6} A ${d.w} ${d.w} 0 0 0 ${d.x + d.w} ${d.y + 6 + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x + d.w, y1: d.y + 6, x2: d.x + d.w, y2: d.y + 6 + d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x} ${d.y + 6} A ${d.w} ${d.w} 0 0 0 ${d.x + d.w} ${d.y + 6 + d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "up-right") {
-            gJoin.appendChild(el("line", { x1: d.x + d.w, y1: d.y, x2: d.x + d.w, y2: d.y - d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + d.w} ${d.y - d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x + d.w, y1: d.y, x2: d.x + d.w, y2: d.y - d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x} ${d.y} A ${d.w} ${d.w} 0 0 1 ${d.x + d.w} ${d.y - d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
           } else if (d.dir === "up-left") {
-            gJoin.appendChild(el("line", { x1: d.x, y1: d.y, x2: d.x, y2: d.y - d.w, stroke: "#334155", "stroke-width": "2" }));
-            gJoin.appendChild(el("path", { d: `M ${d.x + d.w} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x} ${d.y - d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+            gDoor.appendChild(el("line", { x1: d.x, y1: d.y, x2: d.x, y2: d.y - d.w, stroke: "#334155", "stroke-width": "2" }));
+            gDoor.appendChild(el("path", { d: `M ${d.x + d.w} ${d.y} A ${d.w} ${d.w} 0 0 0 ${d.x} ${d.y - d.w}`, fill: "none", stroke: "#64748b", "stroke-width": "1.2", "stroke-dasharray": "4 3" }));
+          }
+          if (state.renovateMode && !isOverlayTop) {
+            gDoor.appendChild(el("rect", { x: d.x, y: d.y - 10, width: d.w, height: 26, fill: "transparent" }));
           }
         }
+
+        if (state.renovateMode && !isOverlayTop) {
+          gDoor.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (isDoorRemoved) {
+              state.removedDoors = state.removedDoors.filter((k) => k !== doorKey);
+            } else {
+              state.removedDoors.push(doorKey);
+            }
+            localStorage.setItem("nelly_removed_doors", JSON.stringify(state.removedDoors));
+            if (window.__renderAnnotationsSidebar) window.__renderAnnotationsSidebar();
+            render(false);
+          });
+        }
+        gJoin.appendChild(gDoor);
       });
 
       svg.appendChild(gJoin);
@@ -766,7 +796,8 @@
     const base = getFloorData(floorKey);
     return {
       ...base,
-      partitions: base.partitions.filter((_, idx) => !state.removedPartitions.includes(`${floorKey}:${idx}`))
+      partitions: base.partitions.filter((_, idx) => !state.removedPartitions.includes(`${floorKey}:${idx}`)),
+      intDoors: base.intDoors.filter((_, idx) => !state.removedDoors.includes(`${floorKey}:${idx}`))
     };
   }
 
@@ -1489,17 +1520,32 @@
 
     function renderAnnotationsSidebar() {
       const listEl = document.getElementById("annotations-list");
+      const copyBtn = document.getElementById("btn-copy-demolished");
       if (!listEl) return;
       const items = [];
       state.removedPartitions.forEach((pk) => {
         const [fl, idx] = pk.split(":");
+        const p = DATA.floors[fl]?.partitions?.[Number(idx)];
+        const coords = p ? ` [${p.join(", ")}]` : "";
         items.push(`
-          <div class="annotation-item" style="border-left:3px solid #f97316;">
-            <span style="flex:1; color:#fdba74;"><strong>${fl.toUpperCase()}</strong> : Cloison #${Number(idx) + 1} ouverte</span>
+          <div class="annotation-item" style="border-left:3px solid #ef4444;">
+            <span style="flex:1; color:#fca5a5;"><strong>${fl.toUpperCase()}</strong> : Mur #${Number(idx) + 1} tombé${coords}</span>
             <button class="btn" data-restore-part="${pk}" style="padding:2px 6px; font-size:10px;">Remettre</button>
           </div>
         `);
       });
+      state.removedDoors.forEach((dk) => {
+        const [fl, idx] = dk.split(":");
+        items.push(`
+          <div class="annotation-item" style="border-left:3px solid #f97316;">
+            <span style="flex:1; color:#fdba74;"><strong>${fl.toUpperCase()}</strong> : Porte #${Number(idx) + 1} supprimée</span>
+            <button class="btn" data-restore-door="${dk}" style="padding:2px 6px; font-size:10px;">Remettre</button>
+          </div>
+        `);
+      });
+      if (copyBtn) {
+        copyBtn.style.display = (state.removedPartitions.length || state.removedDoors.length) ? "inline-flex" : "none";
+      }
       state.annotations.forEach((ann, idx) => {
         const col = NOTE_COLORS[ann.cat] || "#f59e0b";
         items.push(`
@@ -1529,9 +1575,45 @@
           render(false);
         });
       });
+      listEl.querySelectorAll("[data-restore-door]").forEach((b) => {
+        b.addEventListener("click", () => {
+          const dk = b.dataset.restoreDoor;
+          state.removedDoors = state.removedDoors.filter((k) => k !== dk);
+          localStorage.setItem("nelly_removed_doors", JSON.stringify(state.removedDoors));
+          renderAnnotationsSidebar();
+          render(false);
+        });
+      });
     }
     window.__renderAnnotationsSidebar = renderAnnotationsSidebar;
     renderAnnotationsSidebar();
+
+    const copyDemolishedBtn = document.getElementById("btn-copy-demolished");
+    if (copyDemolishedBtn) {
+      copyDemolishedBtn.addEventListener("click", async () => {
+        const payload = {
+          removedPartitions: state.removedPartitions.map((pk) => {
+            const [floor, idxStr] = pk.split(":");
+            const index = Number(idxStr);
+            return { key: pk, floor, index, rect: DATA.floors[floor]?.partitions?.[index] || null };
+          }),
+          removedDoors: state.removedDoors.map((dk) => {
+            const [floor, idxStr] = dk.split(":");
+            const index = Number(idxStr);
+            return { key: dk, floor, index, door: DATA.floors[floor]?.intDoors?.[index] || null };
+          })
+        };
+        const text = `Murs et portes déjà tombés à supprimer définitivement des plans :\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
+        try {
+          await navigator.clipboard.writeText(text);
+          const prev = copyDemolishedBtn.textContent;
+          copyDemolishedBtn.textContent = "Copié !";
+          setTimeout(() => { copyDemolishedBtn.textContent = prev; }, 2000);
+        } catch {
+          window.prompt("Copiez ce texte et envoyez-le moi :", text);
+        }
+      });
+    }
 
     const selectBtn = document.getElementById("btn-select");
     function clearToolModes(except) {
@@ -1545,7 +1627,7 @@
       annotateBtn.classList.toggle("active", state.annotateMode);
       banner.classList.toggle("visible", state.measureMode || state.renovateMode || state.annotateMode);
       if (state.measureMode) banner.innerHTML = "Mode Mesure : cliquez 2 points (<strong>Shift</strong> orthogonal, <strong>Échap</strong> annuler)";
-      else if (state.renovateMode) banner.innerHTML = "Mode Cloisons : cliquez sur une cloison (6 cm) pour l'ouvrir ou la remettre";
+      else if (state.renovateMode) banner.innerHTML = "Mode Murs tombés : cliquez sur les cloisons ou portes déjà supprimées, puis sur « Copier pour IA »";
       else if (state.annotateMode) banner.innerHTML = "Mode Annotation : cliquez sur le plan pour ajouter une note de chantier";
     }
 
@@ -1589,8 +1671,10 @@
 
     document.getElementById("btn-reset-works").addEventListener("click", () => {
       state.removedPartitions = [];
+      state.removedDoors = [];
       state.annotations = [];
       localStorage.removeItem("nelly_removed_partitions");
+      localStorage.removeItem("nelly_removed_doors");
       localStorage.removeItem("nelly_annotations");
       renderAnnotationsSidebar();
       render(false);
@@ -1622,6 +1706,7 @@
         exportedAt: new Date().toISOString(),
         northAngle: state.northAngle,
         removedPartitions: state.removedPartitions,
+        removedDoors: state.removedDoors,
         annotations: state.annotations,
         budget: loadJSON("nelly_budget_v2", null)
       };
@@ -1646,6 +1731,10 @@
           if (Array.isArray(data.removedPartitions)) {
             state.removedPartitions = data.removedPartitions;
             localStorage.setItem("nelly_removed_partitions", JSON.stringify(state.removedPartitions));
+          }
+          if (Array.isArray(data.removedDoors)) {
+            state.removedDoors = data.removedDoors;
+            localStorage.setItem("nelly_removed_doors", JSON.stringify(state.removedDoors));
           }
           if (Array.isArray(data.annotations)) {
             state.annotations = data.annotations;

@@ -708,10 +708,29 @@ svg.renovate-active .partition-editable:hover {
 }
 
 .partition-removed {
-  fill: rgba(249, 115, 22, 0.12) !important;
-  stroke: #f97316 !important;
+  fill: rgba(239, 68, 68, 0.16) !important;
+  stroke: #ef4444 !important;
   stroke-width: 1.8 !important;
   stroke-dasharray: 6 4 !important;
+}
+
+svg.renovate-active .door-editable {
+  cursor: pointer;
+}
+
+svg.renovate-active .door-editable:hover * {
+  stroke: #ef4444 !important;
+}
+
+svg.renovate-active .door-removed * {
+  stroke: #ef4444 !important;
+  stroke-dasharray: 4 3 !important;
+  opacity: 0.45;
+}
+
+svg:not(.renovate-active) .partition-removed,
+svg:not(.renovate-active) .door-removed {
+  display: none !important;
 }
 
 .annotation-item {
