@@ -819,7 +819,7 @@ svg.renovate-active .partition-editable:hover {
 /* Impression PDF */
 @media print {
   @page {
-    size: A3 landscape;
+    size: A4 portrait;
     margin: 10mm;
   }
   body {
@@ -845,9 +845,17 @@ svg.renovate-active .partition-editable:hover {
     overflow: visible;
   }
   .sheet-container {
+    position: static;
     box-shadow: none;
     border: none;
+    padding: 0;
     transform: none !important;
     width: 100%;
+    max-width: 100%;
+  }
+  .sheet-container svg {
+    width: 100%;
+    height: auto;
+    max-height: 255mm;
   }
 }
